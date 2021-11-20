@@ -11,7 +11,7 @@ console.log("This program will list a stock's details for a given date within th
 var stockName = "";
 var readStock = true;
 while (readStock) {
-    stockName = prompt("Enter a stock: ");
+    stockName = prompt("Enter a stock symbol: ");
 
     var url = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=' + stockName + '&apikey=' + process.env.KEY;
 
@@ -21,6 +21,7 @@ while (readStock) {
         !isCharNumber(stockDate[3]) || !isCharNumber(stockDate[4]) || stockDate[5] != '/' || !isCharNumber(stockDate[6]) ||
         !isCharNumber(stockDate[7]) || !isCharNumber(stockDate[8]) || !isCharNumber(stockDate[9])) {
         console.log("Incorrect date format");
+        readStock = false;
     }
     else {
         request.get({ url: url, json: true, headers: { 'User-Agent': 'request' } }, (err, res, data) => {   // read stock data from API and make sure no errors occur
@@ -43,8 +44,22 @@ while (readStock) {
                 else {
                     console.log(stockData);
                     var read = prompt("Continue reading stock data? Y/N: ");
-                    if (read.toLowerCase().replace(/\s/g, '') != "y") {
+                    if (read.toLowerCase().replace(/\s/g, '') == "n") {
                         readStock = false;
+                    }
+                    else if (read.toLowerCase().replace(/\s/g, '') != "y" || read.toLowerCase().replace(/\s/g, '') != "n") {
+                        var incorrectFormat = true;
+                        while (incorrectFormat) {
+                            console.log("Incorrect answer format, expected Y or N");
+                            read = prompt("Continue reading stock data? Y/N: ");
+                            if (read.toLowerCase().replace(/\s/g, '') == "n") {
+                                readStock = false;
+                                incorrectFormat = false;
+                            }
+                            else if (read.toLowerCase().replace(/\s/g, '') == "y") {
+                                readStock = false;
+                            }
+                        }
                     }
                 }
             }
